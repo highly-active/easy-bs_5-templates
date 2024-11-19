@@ -38,18 +38,37 @@
             margin-left: 250px;
             width: calc(100% - 250px);
         }
+    
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+            .content {
+                margin-left: 0;
+            }
+            .navbar {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
     </style>
+    
 </head>
 <body>
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <h4 class="text-center">Admin Panel</h4>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#users">Users</a>
-        <a href="#settings">Settings</a>
-        <a href="#reports">Reports</a>
-        <a href="#logout">Logout</a>
+        <div class="container-fluid">
+            <h4 class="text-center">Admin Panel</h4>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#users">Users</a>
+            <a href="#settings">Settings</a>
+            <a href="#reports">Reports</a>
+            <a href="#logout">Logout</a>
+        </div>
     </div>
 
     <!-- Top Navbar -->
@@ -114,7 +133,92 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Recent Activity</h5>
-                            <p class="card-text">Here you can see the recent activities...</p>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered table-striped">
+                                  <thead class="thead-dark">
+                                    <tr>
+                                      <th scope="col">ID</th>
+                                      <th scope="col">Name</th>
+                                      <th scope="col">Age</th>
+                                      <th scope="col">Salary</th>
+                                      <th scope="col">Department</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <td>8611</td>
+                                      <td>UVPRHBJ</td>
+                                      <td>60</td>
+                                      <td>34359.63</td>
+                                      <td>Sales</td>
+                                    </tr>
+                                    <tr>
+                                      <td>4565</td>
+                                      <td>FEXAYFV</td>
+                                      <td>61</td>
+                                      <td>115080.09</td>
+                                      <td>Finance</td>
+                                    </tr>
+                                    <tr>
+                                      <td>3639</td>
+                                      <td>YTEUDAS</td>
+                                      <td>47</td>
+                                      <td>110644.73</td>
+                                      <td>HR</td>
+                                    </tr>
+                                    <tr>
+                                      <td>7396</td>
+                                      <td>YJQTSGL</td>
+                                      <td>39</td>
+                                      <td>50733.46</td>
+                                      <td>Marketing</td>
+                                    </tr>
+                                    <tr>
+                                      <td>3391</td>
+                                      <td>FNPSYRK</td>
+                                      <td>45</td>
+                                      <td>47136.60</td>
+                                      <td>Sales</td>
+                                    </tr>
+                                    <tr>
+                                      <td>7398</td>
+                                      <td>GWXYAVK</td>
+                                      <td>50</td>
+                                      <td>103282.98</td>
+                                      <td>Marketing</td>
+                                    </tr>
+                                    <tr>
+                                      <td>3392</td>
+                                      <td>IDSJVBN</td>
+                                      <td>25</td>
+                                      <td>89139.33</td>
+                                      <td>Finance</td>
+                                    </tr>
+                                    <tr>
+                                      <td>2252</td>
+                                      <td>TGQFYAH</td>
+                                      <td>26</td>
+                                      <td>77250.39</td>
+                                      <td>Finance</td>
+                                    </tr>
+                                    <tr>
+                                      <td>5334</td>
+                                      <td>ATZJRRU</td>
+                                      <td>48</td>
+                                      <td>95987.96</td>
+                                      <td>Marketing</td>
+                                    </tr>
+                                    <tr>
+                                      <td>9666</td>
+                                      <td>SYLOHMS</td>
+                                      <td>30</td>
+                                      <td>82272.17</td>
+                                      <td>IT</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                              
                         </div>
                     </div>
                 </div>
