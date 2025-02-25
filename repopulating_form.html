@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Product Disassembly</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+    <style>
+        .hidden { display: none; }
+        .container { max-width: 600px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">Product Disassembly Form</h2>
+
+    <div id="productInfoPage">
+        <div class="mb-3">
+            <label class="form-label">Brand Name</label>
+            <input type="text" id="brand" class="form-control" placeholder="e.g., Dyson">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Model</label>
+            <input type="text" id="model" class="form-control" placeholder="e.g., Airwrap">
+        </div>
+        <button class="btn btn-primary w-100" id="startBtn">Start Disassembling</button>
+    </div>
+
+    <div id="partsPage" class="hidden">
+        <div id="partForms"></div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <button class="btn btn-secondary hidden" id="prevPartBtn">Previous</button>
+            <button class="btn btn-primary ms-auto hidden" id="nextPartBtn">Next</button>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn btn-success hidden" id="submitBtn">Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let parts = [];
+    let connections = []; // NEW: Connections array with unique IDs
+    let currentIndex = -1;
+    let partIdCounter = 1;
+    let connectionIdCounter = 1; // NEW: Unique ID for connections
+
+    $(document).ready(() => {
+        $("#startBtn").click(() => {
+            $("#productInfoPage").hide();
+            $("#partsPage").show();
+            addPart();
+            currentIndex = 0;
+            updateUI();
+        });
+
+        $("#nextPartBtn").click(() => {
+            savePartData();
+            if (currentIndex >= parts.length - 1) {
+                addPart();
+            }
+            currentIndex++;
+            updateUI();
+        });
+
+        $("#prevPartBtn").click(() => {
+            savePartData();
+            currentIndex--;
+            updateUI();
+        });
+
+        $("#submitBtn").click(() => {
+            savePartData();
+            console.log("Parts:", parts);
+            console.log("Connections:", connections);
+           // alert("Check the console for the saved data.");
+        });
+    });
+
+    function addPart() {
+        let newPart = {
+            id: 1000 + partIdCounter++,
+            part_name: "",
+            orientation: "",
+            disassembly_orientation: "",
+            reusability: "",
+            comment: "",
+            repetitions: 1,
+            subassembly: false
+        };
+        parts.push(newPart);
+    }
+
+    function savePartData() {
+        if (currentIndex < 0 || currentIndex >= parts.length) return;
+
+        let part = parts[currentIndex];
+        let form = $("#partForms").children().first();
+
+        part.part_name = form.find("#partName").val() || "";
+        part.orientation = form.find("#partOrientation").val() || "";
+        part.disassembly_orientation = form.find("#disassemblyOrientation").val() || "";
+        part.reusability = form.find("#reusability").val() || "";
+        part.comment = form.find("#comment").val() || "";
+        part.repetitions = parseInt(form.find("#repetitions").val()) || 1;
+        part.subassembly = form.find("#subassembly").prop("checked");
+
+        // Save connections with unique IDs
+        form.find(".connection-entry").each(function () {
+            let connPartId = $(this).find(".connection-select").val();
+            if (connPartId && connPartId !== "new") {
+                addConnection(part.id, parseInt(connPartId));
+            } else {
+                let newConnPartName = $(this).find(".new-part-name").val();
+                if (newConnPartName) {
+                    let newPart = { id: partIdCounter++, part_name: newConnPartName };
+                    parts.push(newPart);
+                    addConnection(part.id, newPart.id);
+                }
+            }
+        });
+
+        updateConnectionsDropdown();
+    }
+
+    function addConnection(partA, partB) {
+        if (!connections.some(c => c.part_a === partA && c.part_b === partB)) {
+            connections.push({ id: connectionIdCounter++, part_a: partA, part_b: partB });
+        }
+    }
+
+    function updateUI() {
+        if (currentIndex < 0 || currentIndex >= parts.length) return;
+
+        let part = parts[currentIndex];
+        $("#partForms").empty();
+
+        $("#partForms").append(`
+            <div>
+                <h3>Part ${currentIndex + 1}</h3>
+                <div class="mb-3">
+                    <label class="form-label">Part Name</label>
+                    <input type="text" id="partName" class="form-control" value="${part.part_name}">
+                </div>
+                <div id="connectionContainer"></div>
+                <button type="button" class="btn btn-success mt-2" id="addConnectionBtn">+ Add Connection</button>
+            </div>
+        `);
+
+        $("#addConnectionBtn").click(() => addConnectionField());
+
+        connections
+            .filter(c => c.part_a === part.id)
+            .forEach(connection => addConnectionField(connection.part_b));
+
+        $("#prevPartBtn").toggle(currentIndex > 0);
+        $("#nextPartBtn").show();
+        $("#submitBtn").toggle(currentIndex === parts.length - 1);
+    }
+
+    function addConnectionField(existingConnectionId = null) {
+        let options = parts.map(part => `<option value="${part.id}" ${existingConnectionId == part.id ? "selected" : ""}>${part.part_name || "Unnamed Part"}</option>`).join("");
+        $("#connectionContainer").append(`
+            <div class="connection-entry mt-2">
+                <select class="connection-select form-select">${options}<option value="new">New Part...</option></select>
+                <input type="text" class="form-control new-part-name hidden mt-1" placeholder="Enter new part name">
+            </div>
+        `);
+        $(".connection-select").change(function () {
+            $(this).siblings(".new-part-name").toggle($(this).val() === "new");
+        });
+    }
+
+    function updateConnectionsDropdown() {
+        $(".connection-select").each(function () {
+            let selectedValue = $(this).val();
+            let options = parts.map(part => `<option value="${part.id}">${part.part_name || "Unnamed Part"}</option>`).join("");
+            $(this).html(options + '<option value="new">New Part...</option>').val(selectedValue);
+        });
+    }
+</script>
+</body>
+</html>
